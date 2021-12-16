@@ -1,12 +1,18 @@
-import React, { useState, } from '../react';
+import React, { useState, useLayoutEffect, } from '../react';
 import './index.less';
 
 /**@jsx React.createElement */
 const Box = props => {
-  const { count, } = props;
+  const { count, children, } = props;
+  useLayoutEffect(() => {
+    console.log('box');
+  }, []);
   return (
-    <div className="box">
-      点击的次数为: {count}
+    <div>
+      <div className="box">
+        点击的次数为: {count}
+      </div>
+      {children}
     </div>
   )
 }
@@ -14,13 +20,26 @@ const Box = props => {
 const App = () => {
   const [count, setCount] = useState(0);
   const list = [1,2,3,4,5];
+
   const clickEvent = () => {
     console.log('点击了');
     setCount(prev => prev + 1);
   }
+
+  useLayoutEffect(() => {
+    console.log('count数据变动为:' + count);
+  }, [count]);
+
+  useLayoutEffect(() => {
+    setCount(10);
+    console.log('app');
+  }, []);
+
   return (
     <div className="app">
-      <Box count={count} />
+      <Box count={count}>
+        测试组件
+      </Box>
       <div className="btn" onClick={clickEvent}>点击+1</div>
       <div className="list-wrap">
         {
