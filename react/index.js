@@ -17,7 +17,8 @@ let nextUnitOfWork = null,
   wipRoot = null,
   currentRoot = null,
   hookIndex = null,
-  wipFiber = null;
+  wipFiber = null,
+  layoutEffects = null;
 ;
 
 function createElement (type, props, ...children){
@@ -62,7 +63,8 @@ function runEffects (fiber, tag){
   fiber.hooks.filter(
     hook => hook.tag === tag && hook.effect
   ).forEach(effectHook => {
-    effectHook.cancel = effectHook.effect?.();
+    // effectHook.cancel = effectHook.effect?.();
+    layoutEffects.unshift(effectHook);
   });
 }
 
@@ -98,6 +100,9 @@ function commitRoot (){
   currentRoot = wipRoot;
   commitWork(wipRoot.child);
   wipRoot = null;
+  layoutEffects.forEach(effectHook => {
+    effectHook.cancel = effectHook?.effect?.();
+  });
 }
 
 function reconcileChildren (wipFiber, elements){
@@ -205,12 +210,12 @@ function updateHostComponent (fiber){
   reconcileChildren(fiber, fiber.props.children.flat())
 }
 
-function compareDepsChanged (nextDeps, prevDeps){
+function compareDepsChanged (prevDeps, nextDeps){
   return !nextDeps || !prevDeps || nextDeps.length !== prevDeps.length || prevDeps.some((dep, index) => !Object.is(dep, nextDeps[index]));
 }
 
 function useLayoutEffect (effect, deps){
-  const oldHook = wipFiber?.alternate?.hook?.[hookIndex];
+  const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
   const hasChanged = compareDepsChanged(oldHook ? oldHook.deps : undefined, deps);
   const hook = {
     tag: 'LAYOUT_EFFECT',
@@ -241,6 +246,7 @@ function useState (action){
     };
     nextUnitOfWork = wipRoot;
     deletions = [];
+    layoutEffects = [];
   }
   hookIndex++;
   wipFiber.hooks.push(hook);
@@ -293,4 +299,5 @@ function render (element, container){
   };
   nextUnitOfWork = wipRoot;
   deletions = [];
+  layoutEffects = [];
 }

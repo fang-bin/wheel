@@ -31,7 +31,7 @@ const App = () => {
   }, [count]);
 
   useLayoutEffect(() => {
-    setCount(10);
+    // setCount(10);
     console.log('app');
   }, []);
 
