@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, } from '../react';
+import React, { useState, useLayoutEffect, useEffect, } from '../react';
 import './index.less';
 
 /**@jsx React.createElement */
@@ -6,6 +6,12 @@ const Box = props => {
   const { count, children, } = props;
   useLayoutEffect(() => {
     console.log('box');
+  }, []);
+  useLayoutEffect(() => {
+    console.log('box1');
+  }, []);
+  useEffect(() => {
+    console.log('effect box');
   }, []);
   return (
     <div>
@@ -31,8 +37,13 @@ const App = () => {
   }, [count]);
 
   useLayoutEffect(() => {
-    // setCount(10);
+    setCount(10);
+    console.log('变化了没', count)
     console.log('app');
+  }, []);
+
+  useEffect(() => {
+    console.log('effect app');
   }, []);
 
   return (

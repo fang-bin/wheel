@@ -3,6 +3,7 @@ export default {
   render,
   useState,
   useLayoutEffect,
+  useEffect,
 }
 
 export {
@@ -10,6 +11,7 @@ export {
   render,
   useState,
   useLayoutEffect,
+  useEffect,
 }
 
 let nextUnitOfWork = null,
@@ -18,7 +20,8 @@ let nextUnitOfWork = null,
   currentRoot = null,
   hookIndex = null,
   wipFiber = null,
-  layoutEffects = null;
+  layoutEffects = null,
+  effects = null;
 ;
 
 function createElement (type, props, ...children){
@@ -60,11 +63,11 @@ function cancelEffects (fiber, tag){
 
 function runEffects (fiber, tag){
   if (!fiber.hooks) return;
+  let effectStack = tag === 'LAYOUT_EFFECT' ? layoutEffects : effects;
   fiber.hooks.filter(
     hook => hook.tag === tag && hook.effect
-  ).forEach(effectHook => {
-    // effectHook.cancel = effectHook.effect?.();
-    layoutEffects.unshift(effectHook);
+  ).reverse().forEach(effectHook => {
+    effectStack.unshift(effectHook);
   });
 }
 
@@ -77,11 +80,13 @@ function commitWork (fiber){
   if (fiber.effectTag === 'UPDATE') {
     cancelEffects(fiber, 'LAYOUT_EFFECT');
     runEffects(fiber, 'LAYOUT_EFFECT');
+    runEffects(fiber, 'EFFECT');
     if (fiber.dom) {
       updateDom(fiber.dom, fiber.alternate.props, fiber.props);
     }
   }else if (fiber.effectTag === 'PLACEMENT') {
     runEffects(fiber, 'LAYOUT_EFFECT');
+    runEffects(fiber, 'EFFECT');
     if (fiber.dom) {
       domParent.appendChild(fiber.dom);
     }
@@ -102,6 +107,12 @@ function commitRoot (){
   wipRoot = null;
   layoutEffects.forEach(effectHook => {
     effectHook.cancel = effectHook?.effect?.();
+  });
+
+  requestIdleCallback(() => {
+    effects.forEach(effectHook => {
+      effectHook.cancel = effectHook?.effect?.();
+    });
   });
 }
 
@@ -227,6 +238,19 @@ function useLayoutEffect (effect, deps){
   hookIndex++;
 }
 
+function useEffect (effect, deps){
+  const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
+  const hasChanged = compareDepsChanged(oldHook ? oldHook.deps : undefined, deps);
+  const hook = {
+    tag: 'EFFECT',
+    effect: hasChanged ? effect : null,
+    cancel: hasChanged && oldHook?.cancel,
+    deps,
+  };
+  wipFiber.hooks.push(hook);
+  hookIndex++;
+}
+
 function useState (action){
   const oldHook = wipFiber?.alternate?.hooks?.[hookIndex];
   const hook = {
@@ -300,4 +324,5 @@ function render (element, container){
   nextUnitOfWork = wipRoot;
   deletions = [];
   layoutEffects = [];
+  effects = [];
 }
