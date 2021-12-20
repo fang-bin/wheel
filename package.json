@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --config webpack.config.js"
+    "start": "webpack serve --config webpack.config.js",
+    "testp": "promises-aplus-tests ./my-promise/index.js"
   },
   "repository": "git@github.com:fang-bin/wheel.git",
   "author": "wb-fb497619 <wb-fb497619@alibaba-inc.com>",
@@ -21,6 +22,7 @@
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.4.5",
     "postcss-loader": "^6.2.1",
+    "promises-aplus-tests": "^2.1.2",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.4",
