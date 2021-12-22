@@ -6,12 +6,30 @@
  */
 Array.prototype.myIndexOf = function (search, start){
   const len = this.length;
-  let index = start;
+  let index = start ?? 0;
   if (index >= len) return -1;
   else if(index < 0) index = Math.abs(index) > len ? 0 : len + index;
   while (index < len) {
     if (this[index] === search) return index;
     index++;
+  }
+  return -1;
+}
+
+/**
+ * @description Array.prototype.lastIndexOf
+ * @param {*} search 
+ * @param {*} start 
+ * @returns 
+ */
+Array.prototype.myLastIndexOf = function (search, start){
+  const len = this.length;
+  let index = start ?? len - 1;
+  if (index >= len) index = len - 1;
+  else if(index < 0) index = Math.abs(index) > len ? 0 : len + index;
+  while (index >= 0) {
+    if (this[index] === search) return index;
+    index--;
   }
   return -1;
 }
@@ -23,7 +41,7 @@ Array.prototype.myIndexOf = function (search, start){
  * @returns {number} 目标元素的位置，没有则返回-1
  */
 Array.prototype.myFindIndex = function (fn, thisArg){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
   const len = this.length;
   let index = 0;
   while (index < len) {
@@ -40,7 +58,7 @@ Array.prototype.myFindIndex = function (fn, thisArg){
  * @returns {*} 目标元素，没有则返回undefined
  */
 Array.prototype.myFind = function (fn, thisArg){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
   const len = this.length;
   let index = 0;
   while (index < len) {
@@ -57,7 +75,7 @@ Array.prototype.myFind = function (fn, thisArg){
  * @returns {Array} 处理过的一个新数组
  */
 Array.prototype.myMap = function (fn, thisArg){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
   const len = this.length;
   let index = 0, arr = new Array(len);
   while (index < len) {
@@ -75,7 +93,7 @@ Array.prototype.myMap = function (fn, thisArg){
  * @param {*} thisArg 遍历函数中的this对象
  */
 Array.prototype.myForEach = function (fn, thisArg){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
   const len = this.length;
   let index = 0;
   while (index < len) {
@@ -85,13 +103,167 @@ Array.prototype.myForEach = function (fn, thisArg){
 }
 
 /**
+ * @description Array.prototype.filter
+ * @param {*} fn 
+ * @param {*} thisArg 
+ * @returns 
+ */
+Array.prototype.myFilter = function (fn, thisArg){
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
+  const len = this.length;
+  let arr = [], index = 0;
+  while (index < len) {
+    if (Reflect.has(this, index) && fn.call(thisArg, this[index], index, this)) {
+      arr.push(this[index]);
+    }
+    index++;
+  }
+  return arr;
+}
+
+/**
+ * @description Array.prototype.some
+ * @param {*} fn 
+ * @param {*} thisArg 
+ * @returns 
+ */
+Array.prototype.mySome = function (fn, thisArg){
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
+  const len = this.length;
+  let index = 0;
+  while (index < len) {
+    if (Reflect.has(this, index) && fn.apply(thisArg, this[index], index, this)) return true;
+    index++;
+  }
+  return false;
+}
+
+/**
+ * @description Array.prototype.every
+ * @param {*} fn 
+ * @param {*} thisArg 
+ * @returns 
+ */
+Array.prototype.myEvery = function (fn, thisArg){
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
+  const len = this.length;
+  let index = 0;
+  while (index < len) {
+    if (Reflect.has(this, index) && !fn.apply(thisArg, this[index], index, this)) return false;
+    index++;
+  }
+  return true;
+}
+
+/**
+ * @description Array.prototype.concat
+ * @param  {...any} arrs 
+ * @returns 
+ */
+Array.prototype.myConcat = function (...arrs){
+  const len = this.length;
+  let array = new Array(len);
+  for (let i = 0; i < len; i++) array[i] = this[i];
+
+  for (let i = 0; i < arrs.length; i++) {
+    for (let j = 0; j < arrs[i].length; j++) {
+      array.push(arrs[i][j]);
+    }
+  }
+
+  return array;
+}
+
+/**
+ * @description Array.prototype.fill
+ * @param {*} flag 
+ * @returns 
+ */
+Array.prototype.myFill = function (flag){
+  const len = this.length;
+  let index = 0;
+  while (index < len) {
+    this[index] = flag;
+    index++;
+  }
+  return this;
+}
+
+/**
+ * @description Array.prototype.flat
+ * @param {*} depth 
+ * @returns 
+ */
+Array.prototype.myFlat = function (depth){
+  depth = depth ?? 1;
+  if (depth < 0) {
+    depth = 0;
+  }
+
+  let res = [];
+  (function flatten (arr, count){
+    for (let i = 0; i < arr.length; i++) {
+      if (Array.isArray(arr[i]) && count > 0) {
+        flatten(arr[i], count - 1);
+      }else {
+        if (Reflect.has(arr, i)) {
+          res.push(arr[i]);
+        }
+      }
+    }
+  })(this, depth);
+
+  return res;
+}
+
+Array.prototype.myFlatMap = function (fn, thisArg){
+  
+}
+
+Array.prototype.myIncludes = function (){
+  
+}
+
+Array.prototype.myJoin = function (){
+  
+}
+
+Array.prototype.myKeys = function (){
+  
+}
+
+Array.prototype.myValues = function (){
+  
+}
+
+Array.prototype.myEntries = function (){
+  
+}
+
+Array.prototype.myPush = function (){
+  
+}
+
+Array.prototype.myPop = function (){
+  
+}
+
+Array.prototype.myUnshift = function (){
+  
+}
+
+Array.prototype.myShift = function (){
+  
+}
+
+/**
  * @description Array.prototype.reduce
  * @param {*} fn 遍历函数(从头到尾)
  * @param {*} initValue 初始值
  * @returns {*} 最后返回值
  */
 Array.prototype.myReduce = function (fn, initValue){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError('MyReduce of empty array with no initial value');
   const len = this.length;
   let value = initValue, index = 0;
   if (value === undefined) {
@@ -115,7 +287,7 @@ Array.prototype.myReduce = function (fn, initValue){
  * @returns {*} 最后返回值
  */
 Array.prototype.myReduceRight = function (fn, initValue){
-  if (typeof fn !== 'function') throw new TypeError();
+  if (typeof fn !== 'function') throw new TypeError(`MyReduceRight of empty array with no initial value`);
   const len = this.length;
   let value = initValue, index = len - 1;
   if (value === undefined) {
@@ -143,11 +315,11 @@ Array.prototype.mySplice = function (index, delNum, ...adds){
   const len = this.length;
   const addCount = adds.length;
 
-  let startIndex = index;
+  let startIndex = index ?? 0;
   if (startIndex > len) startIndex = len;
   else if (startIndex < 0) startIndex = Math.abs(startIndex) > len ? 0 : len + startIndex;
 
-  let delCount = delNum;
+  let delCount = delNum ?? 0;
   if (delCount > len - startIndex) delCount = len - startIndex;
   else if (delCount < 0) delCount = 0;
 
@@ -195,11 +367,11 @@ Array.prototype.mySplice = function (index, delNum, ...adds){
  */
 Array.prototype.mySlice = function (start, end){
   const len = this.length;
-  let startIndex = start;
+  let startIndex = start ?? 0;
   if (startIndex > len) return [];
   else if (startIndex < 0) startIndex = Math.abs(startIndex) > len ? 0 : len + startIndex;
 
-  let endIndex = end;
+  let endIndex = end ?? len - 1;
   if (endIndex > len) endIndex = len;
   else if (endIndex < 0) endIndex = Math.abs(endIndex) > len ? 0 : len + endIndex;
 
@@ -212,5 +384,19 @@ Array.prototype.mySlice = function (start, end){
   return result;
 }
 
+/**
+ * @description Array.isArray
+ * @param {*} target 
+ * @returns 
+ */
+Array.myIsArray = function (target){
+  return Object.prototype.toString.call(target).toLowerCase().slice(8, -1) === 'array';
+}
 
+Array.myOf = function (){
+  
+}
 
+Array.myFrom = function (){
+  
+}

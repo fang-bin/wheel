@@ -3,15 +3,28 @@
  * @author fangbin
  * @param {function} fn
  * @param {number ms} time
+ * @param {boolean} debounced  是否最后触发一次，算是防抖和节流的一种融合
  */
-function throttle (fn, time){
-  let t = undefined;
-  return function (...args){
+function throttle (fn, time, debounced){
+  let t = undefined, timer = null;
+
+  let throttled = function (...args){
     if (!t || Date.now() - t >= time) {
-      fn(...args);
+      fn.apply(this, args);
       t = Date.now();
     }
+    if (debounced) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(fn.bind(this, ...args), time);
+    }
   }
+  
+  throttled.cancel = function (){
+    clearTimeout(timer);
+    timer = null;
+  }
+
+  return throttled;
 }
 
 /**
@@ -19,13 +32,31 @@ function throttle (fn, time){
  * @author fangbin
  * @param {function} fn
  * @param {number ms} time
+ * @param {boolean} immediate 是否立即执行,已经算是节流的实现了，个人觉得很没有必要
  */
-function debounce (fn, time){
-  let timer = null;
-  return function (...args){
+function debounce (fn, time, immediate){
+  let timer = null, result = undefined;
+
+  let debounced = function (...args){
     if (timer) clearTimeout(timer);
-    timer = setTimeout(fn.bind(undefined, ...args), time);
+    if (immediate) {
+      let callNow = !timer;
+      timer = setTimeout(() => {
+        timer = null;
+      }, time);
+      if (callNow) result = fn.apply(this, args);
+    }else {
+      timer = setTimeout(fn.bind(this, ...args), time);
+    }
+    return result;
   }
+
+  debounced.cancel = function (){
+    clearTimeout(timer);
+    timer = null;
+  };
+
+  return debounced;
 }
 
 /**
@@ -211,6 +242,41 @@ function getType (target){
   return Object.prototype.toString.call(target).toLowerCase().slice(8, -1);
 }
 
+/**
+ * @description 柯里化
+ * @author fangbin
+ * @param {function} fn
+ * @param {*} args
+ * @returns
+ */
+function curry (fn, ...args){
+  const len = fn.length;
+  return function (..._args){
+    const params = args.concat(_args);
+    if (params.length < len) return curry.apply(this, params);
+    else return fn.apply(this, params);
+  }
+}
+
+/**
+ * @description 浅比较
+ * @author fangbin
+ * @param {*} a
+ * @param {*} b
+ * @returns
+ */
+function shallowEqual (a, b){
+  if (Object.is(a, b)) return true;
+  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  for (let i = 0; i < aKeys.length; i++) {
+    if (!Reflect.has(b, aKeys[i]) || !Object.is(a[aKeys[i]], b[aKeys[i]])) return false;
+  }
+  return true;
+}
+
 export {
   throttle,
   debounce,
@@ -222,4 +288,6 @@ export {
   render,
   thousands,
   getType,
+  curry,
+  shallowEqual,
 };
