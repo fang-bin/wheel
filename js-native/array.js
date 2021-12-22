@@ -1,3 +1,9 @@
+/**
+ * @description Array.prototype.indexOf
+ * @param {*} search 查找目标
+ * @param {*} start 起始位置
+ * @returns {number} 目标元素的位置，没有则返回-1
+ */
 Array.prototype.myIndexOf = function (search, start){
   const len = this.length;
   let index = start;
@@ -10,6 +16,12 @@ Array.prototype.myIndexOf = function (search, start){
   return -1;
 }
 
+/**
+ * @description Array.prototype.findIndex
+ * @param {*} fn 查找函数
+ * @param {*} thisArg 查找函数中的this对象
+ * @returns {number} 目标元素的位置，没有则返回-1
+ */
 Array.prototype.myFindIndex = function (fn, thisArg){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -21,6 +33,12 @@ Array.prototype.myFindIndex = function (fn, thisArg){
   return -1;
 }
 
+/**
+ * @description Array.prototype.find
+ * @param {*} fn 查找函数
+ * @param {*} thisArg 查找函数中的this对象
+ * @returns {*} 目标元素，没有则返回undefined
+ */
 Array.prototype.myFind = function (fn, thisArg){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -32,6 +50,12 @@ Array.prototype.myFind = function (fn, thisArg){
   return undefined;
 }
 
+/**
+ * @description Array.prototype.map
+ * @param {*} fn 遍历函数
+ * @param {*} thisArg 遍历函数中的this对象
+ * @returns {Array} 处理过的一个新数组
+ */
 Array.prototype.myMap = function (fn, thisArg){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -45,6 +69,11 @@ Array.prototype.myMap = function (fn, thisArg){
   return arr;
 }
 
+/**
+ * @description Array.prototype.forEach
+ * @param {*} fn 遍历函数
+ * @param {*} thisArg 遍历函数中的this对象
+ */
 Array.prototype.myForEach = function (fn, thisArg){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -55,6 +84,12 @@ Array.prototype.myForEach = function (fn, thisArg){
   }
 }
 
+/**
+ * @description Array.prototype.reduce
+ * @param {*} fn 遍历函数(从头到尾)
+ * @param {*} initValue 初始值
+ * @returns {*} 最后返回值
+ */
 Array.prototype.myReduce = function (fn, initValue){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -73,6 +108,12 @@ Array.prototype.myReduce = function (fn, initValue){
   return value;
 }
 
+/**
+ * @description Array.prototype.reduceRight
+ * @param {*} fn 遍历函数(从尾到头)
+ * @param {*} initValue 初始值
+ * @returns {*} 最后返回值
+ */
 Array.prototype.myReduceRight = function (fn, initValue){
   if (typeof fn !== 'function') throw new TypeError();
   const len = this.length;
@@ -91,6 +132,13 @@ Array.prototype.myReduceRight = function (fn, initValue){
   return value;
 }
 
+/**
+ * @description Array.prototype.splice
+ * @param {*} index 起始位置
+ * @param {*} delNum 删除数量
+ * @param  {...any} adds 新增元素
+ * @returns {Array} 删除元素组成的数组
+ */
 Array.prototype.mySplice = function (index, delNum, ...adds){
   const len = this.length;
   const addCount = adds.length;
@@ -139,6 +187,12 @@ Array.prototype.mySplice = function (index, delNum, ...adds){
   return delArr;
 }
 
+/**
+ * @description Array.prototype.slice
+ * @param {*} start 起始位置
+ * @param {*} end 结束位置
+ * @returns {Array} 截取的数组
+ */
 Array.prototype.mySlice = function (start, end){
   const len = this.length;
   let startIndex = start;

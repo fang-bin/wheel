@@ -1,6 +1,11 @@
 const PENDING = Symbol('pending');
 const FULFILLED = Symbol('fulfilled');
 const REJECTED = Symbol('rejected');
+/**
+ * @description 实现Promise，不过没有完全按照Promise/A+实现
+ * @author fangbin
+ * @class MyPromise
+ */
 class MyPromise {
   #status = PENDING;
   #val = undefined;
@@ -65,7 +70,10 @@ class MyPromise {
     return this.then(undefined, rejectFn);
   }
   finally(callback) {
-
+    return this.then(
+      val => MyPromise.resolve(callback()).then(() => val),
+      err => MyPromise.resolve(callback()).then(() => {throw err}),
+    );
   }
   static resolve(action) {
     if (MyPromise.prototype.isPrototypeOf(action)) return action;
@@ -136,6 +144,11 @@ class MyPromise {
       });
     });
   }
+  /**
+   * @description 可直接rejected状态的MyPromise
+   * @param {*} promise 
+   * @returns 
+   */
   static abort(promise) {
     let _abort = undefined;
     let _abort_promise = new MyPromise((_, reject) => {
@@ -145,9 +158,20 @@ class MyPromise {
     p.abort = _abort;
     return p;
   }
+  /**
+   * @description 不区分fn是否异步，都用 MyPromise 来处理它
+   * @param {*} action 
+   * @returns 
+   */
   static try(action) {
     return new MyPromise(resolve => resolve(typeof action === 'function' ? action() : action));
   }
+  /**
+   * @description promiseFn->rejected后再次尝试执行promiseFn
+   * @param {*} promiseFn 
+   * @param {*} times 
+   * @returns 
+   */
   static retry(promiseFn, times) {
     return new MyPromise(async (resolve, reject) => {
       while (times--) {
@@ -164,6 +188,7 @@ class MyPromise {
   }
 }
 
+// 用来测试MyPromise是否符合Promise/A+
 MyPromise.defer = MyPromise.deferred = function(){
   let dfd = {};
   dfd.promise = new MyPromise((resolve, reject)=>{
