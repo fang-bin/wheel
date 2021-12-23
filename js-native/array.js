@@ -505,6 +505,78 @@ Array.prototype.mySlice = function (start, end){
 }
 
 /**
+ * @description Array.prototype.copyWithin
+ * @param {*} index 
+ * @param {*} start 
+ * @param {*} end 
+ * @returns {Array} 返回原数组（在原数组自身改变）
+ */
+Array.prototype.myCopyWithin = function (index, start, end){
+  const len = this.length;
+  index = index ?? 0;
+  if (index > len) return this;
+  else if(index < 0) index = Math.abs(index) > len ? 0 : len + index;
+  
+  start = start ?? 0;
+  if (start >= len) return this;
+  else if(start < 0) start = Math.abs(start) > len ? 0 : len + start;
+
+  end = end ?? len - 1;
+  if (end > len) end = len;
+  else if (end < 0) end = Math.abs(end) > len ? 0 : len + end;
+
+  if (start >= end) return this;
+
+  const over = end - start;
+  let copyArr = new Array(over);
+  for (let i = 0; i < over; i++) copyArr[i] = this[i + start];
+
+  for (let i = 0; i < over; i++) {
+    if (i + index >= len) break;
+    this[i + index] = copyArr[i];
+  }
+
+  return this;
+}
+
+/**
+ * @description Array.prototype.reverse
+ * @returns 顺序翻转后的原数组
+ */
+Array.prototype.myReverse = function (){
+  const len = this.length;
+  for (let i = 0, j = len - 1; i < j; i++, j--) {
+    [this[i], this[j]] = [this[j], this[i]];
+  }
+  return this;
+}
+
+/**
+ * @description Array.prototype.sort
+ * @param {*} compareFunction 
+ * @returns 返回排序后的原数组
+ */
+Array.prototype.mySort = function (compareFunction){
+  return this;
+}
+
+/**
+ * @description Array.prototype.at 提案方法
+ * @param {*} index 
+ * @returns {*} 对应的数组项
+ */
+Array.prototype.myAt = function (index){
+  const len = this.length;
+  index = index ?? 0;
+  if (index >= len) return undefined;
+  else if (index < 0) {
+    if (Math.abs(index) > len) return undefined;
+    else return this[index + len];
+  }
+  return this[index];
+}
+
+/**
  * @description Array.isArray
  * @param {*} target 
  * @returns 
