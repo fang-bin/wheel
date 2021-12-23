@@ -216,44 +216,164 @@ Array.prototype.myFlat = function (depth){
   return res;
 }
 
+/**
+ * @description Array.prototype.flatMap
+ * @param {*} fn 
+ * @param {*} thisArg 
+ * @returns 
+ */
 Array.prototype.myFlatMap = function (fn, thisArg){
-  
+  if (typeof fn !== 'function') throw new TypeError(`${fn} is not a function`);
+  const len = this.length;
+  let arr = [], index = 0;
+  while (index < len) {
+    if (Reflect.has(this, index)) {
+      arr = arr.concat(fn.call(thisArg, this[index], index, this));
+    }
+    index++;
+  }
+  return arr;
 }
 
-Array.prototype.myIncludes = function (){
+/**
+ * @description Array.prototype.includes
+ * @param {*} search 
+ * @param {*} start 
+ * @returns {Boolean}
+ */
+Array.prototype.myIncludes = (function (){
+  const is = (a, b) => {
+    if (a === b) return true;
+    else return a !== a && b !== b;
+  }
+  return function (search, start){
+    const len = this.length;
+    let index = start ?? 0;
+    if (index >= len) return false;
+    else if(index < 0) index = Math.abs(index) > len ? 0 : len + index;
   
+    while (index < len) {
+      if (is(this[index], search)) return true;
+      index++;
+    }
+  
+    return false;
+  }
+})();
+
+/**
+ * @description Array.prototype.join
+ * @param {*} separator 
+ * @returns 
+ */
+Array.prototype.myJoin = function (separator){
+  separator = separator ?? ',';
+  const len = this.length;
+  let index = 0, result = '';
+  while (index < len) {
+    if (typeof this[index] === 'symbol') throw new TypeError('Cannot convert a Symbol value to a string');
+    result += this[index].toString();
+    if (index !== len - 1) result += separator;
+    index++;
+  }
+  return result;
 }
 
-Array.prototype.myJoin = function (){
-  
-}
-
+/**
+ * @description Array.prototype.keys
+ * @returns ArrayIterator
+ */
 Array.prototype.myKeys = function (){
-  
+  const len = this.length;
+  let arr = new Array(len);
+  for (let i = 0; i < len; i++) arr[i] = i;
+  return arr[Symbol.iterator]();
 }
 
+/**
+ * Array.prototype.values
+ * @returns ArrayIterator
+ */
 Array.prototype.myValues = function (){
-  
+  const len = this.length;
+  let arr = new Array(len);
+  for (let i = 0; i < len; i++) arr[i] = this[i];
+  return arr[Symbol.iterator]();
 }
 
+/**
+ * Array.prototype.entries
+ * @returns ArrayIterator
+ */
 Array.prototype.myEntries = function (){
-  
+  const len = this.length;
+  let arr = new Array(len);
+  for (let i = 0; i < len; i++) arr[i] = [i, this[i]];
+  return arr[Symbol.iterator]();
 }
 
-Array.prototype.myPush = function (){
-  
+/**
+ * @description Array.prototype.push
+ * @param  {...any} adds 
+ * @returns {number} 数组的新长度
+ */
+Array.prototype.myPush = function (...adds){
+  const len = this.length;
+  const addLen = adds.length;
+  this.length = len + addLen;
+  for (let i = 0; i < addLen; i++) {
+    this[i + len] = adds[i];
+  }
+  return this.length;
 }
 
+/**
+ * @description Array.prototype.pop
+ * @returns {*} 删除的元素
+ */
 Array.prototype.myPop = function (){
-  
+  const len = this.length;
+  let delElement = undefined;
+  if (len > 0) {
+    delElement = this[len - 1];
+    this.length = len - 1;
+  }
+  return delElement;
 }
 
-Array.prototype.myUnshift = function (){
-  
+/**
+ * @description Array.prototype.unshift
+ * @param  {...any} adds 
+ * @returns {number} 数组的新长度
+ */
+Array.prototype.myUnshift = function (...adds){
+  const len = this.length;
+  const addLen = adds.length;
+  this.length = len + addLen;
+  for (let i = len + addLen - 1; i >= addLen; i--) {
+    this[i] = this[i - addLen];
+  }
+  for (let i = 0; i < addLen; i++) {
+    this[i] = adds[i];
+  }
+  return this.length;
 }
 
+/**
+ * @description Array.prototype.shift
+ * @returns {*} 删除的元素
+ */
 Array.prototype.myShift = function (){
-  
+  const len = this.length;
+  let delElement = undefined;
+  if (len > 0) {
+    delElement = this[0];
+    for (let i = 0; i < len - 1; i++) {
+      this[i] = this[i + 1];
+    }
+    this.length = len - 1;
+  }
+  return delElement;
 }
 
 /**
@@ -393,10 +513,60 @@ Array.myIsArray = function (target){
   return Object.prototype.toString.call(target).toLowerCase().slice(8, -1) === 'array';
 }
 
-Array.myOf = function (){
-  
+/**
+ * @description Array.of
+ * @param  {...any} elements 
+ * @returns 数组
+ */
+Array.myOf = function (...elements){
+  return elements;
 }
 
-Array.myFrom = function (){
-  
-}
+/**
+ * @description Array.from 对一个类数组或可迭代对象创建一个新的、浅拷贝的数组实例
+ * @param {ArrayLike} arrayLike 类数组（这里的类数组比较宽泛，只要带有length的对象即可，或者是其他的一些数据结构，类似map、set）或可迭代对象
+ * @param {function} mapFn 
+ * @param {*} thisArg 
+ * @bug  对于 Map Set 要单独做处理，后期有时间再完善
+ */
+Array.myFrom = (function (){
+  const getLen = l => {
+    let num = Number(l);
+    num = Number.isNaN(num) ? 0 : num;
+    if (!Number.isFinite(num)) throw new RangeError('Invalid array length');
+    num = (num > 0 ? 1 : -1) * Math.floor(Math.abs(num));
+    // Number.MAX_SAFE_INTEGER === Math.pow(2, 53) - 1;
+    num = Math.max(Math.min(num, 0), Number.MAX_SAFE_INTEGER);
+  }
+
+  return function (arrayLike, mapFn, thisArg){
+    if (mapFn !== undefined && typeof mapFn !== 'function') throw new TypeError(`${mapFn} is not a function`);
+    if (arrayLike === null || arrayLike === undefined) throw new TypeError('Array.from requires an array-like object - not null or undefined');
+    let items = Object(arrayLike);
+    const len = getLen(items.length);
+    let arr = new Array(len), index = 0;
+    while (index < len) {
+      if (mapFn) {
+        arr[index] = mapFn.call(thisArg, items[index], index);
+      }else {
+        arr[index] = items[index];
+      }
+      index++;
+    }
+    return arr;
+  }
+})();
+
+/**
+ * 伪(类)数组对象: 拥有一个 length 属性和若干索引属性的任意对象（其没有数组的方法）
+ * 
+ * 常见类数组：
+ * 1. arguments
+ * 2. NodeList
+ * 
+ * 函数是拥有length属性的对象，但正常情况下没有其他索引属性
+ */
+
+// Array.isArrayLike = function (target){
+//   return typeof target === 'object' && !Array.isArray(target) && Reflect.has(target, 'length')
+// }
