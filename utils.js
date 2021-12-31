@@ -277,6 +277,18 @@ function shallowEqual (a, b){
   return true;
 }
 
+/**
+ * @description 求最大公约数(辗转相除法)
+ * @author fangbin
+ * @param {*} a
+ * @param {*} b
+ * @returns
+ */
+function gcd (a, b){
+  if (b === 0) return a;
+  return gcd(b, a % b);
+}
+
 export {
   throttle,
   debounce,
@@ -290,4 +302,5 @@ export {
   getType,
   curry,
   shallowEqual,
+  gcd,
 };
