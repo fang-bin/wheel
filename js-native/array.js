@@ -1,3 +1,5 @@
+import { timSort, } from './sort-arithmetic';
+
 /**
  * @description Array.prototype.indexOf
  * @param {*} search 查找目标
@@ -557,7 +559,7 @@ Array.prototype.myReverse = function (){
  * @returns 返回排序后的原数组
  */
 Array.prototype.mySort = function (compareFunction){
-  return this;
+  return timSort(this, compareFunction);
 }
 
 /**
