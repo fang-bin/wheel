@@ -2,6 +2,7 @@
  * @description 字典树
  * @author fangbin
  * @class Trie
+ * 字典树如果要实现删除功能，就必须对每个节点添加一个引用计数的属性，以后有时间再去实现
  */
 class Trie {
   children = new Map();

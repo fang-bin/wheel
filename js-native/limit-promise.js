@@ -26,7 +26,7 @@ class LimitPromise {
   _createTask(caller, args, resolve, reject) {
     return () => {
       this.#count++;
-      caller(...args)
+      Promise.resolve(caller(...args))  //兼容caller非Promise的情况
         .then(resolve, reject)
         .finally(() => {
           this.#count--;
