@@ -160,9 +160,10 @@ function quickSort (arr, comparator = (a, b) => a - b){
  * @description 堆排序
  * @author fangbin
  * @param {*} arr
+ * @param {*} [comparator=(a, b) => a - b]
  * @returns 排序后的数组（原地交换）
  */
-function heapSort (arr){
+function heapSort (arr, comparator = (a, b) => a - b){
   if (!Array.isArray(arr)) throw new TypeError(`${arr} must be an array`);
   const len = arr.length;
   if (len < 2) return arr;
