@@ -80,6 +80,7 @@ class Trie {
   searchPrefixWords(prefix) {
     let root = this.searchNode(prefix);
     let result = [];
+    if (!root) return result;
     const traverse = (node, text) => {
       if (node.isEnd) result.push(text);
       for (let [w, nextNode] of node.entries()) {
